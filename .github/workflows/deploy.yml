@@ -55,7 +55,7 @@ jobs:
         run: pnpm run -F my-site build
 
       - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@1
+        uses: actions/upload-pages-artifact@v1
         with:
           path: apps/my-site/dist/
 
