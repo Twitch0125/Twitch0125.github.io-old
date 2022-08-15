@@ -25,16 +25,16 @@ jobs:
   #       with:
   #         path: apps/my-site
   #         package-manager: pnpm
-  # install:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
 
-  #     - uses: pnpm/action-setup@v2.2.2
-  #       with:
-  #         run_install: true
-  #         version: 7
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
   main:
+    needs: install
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
