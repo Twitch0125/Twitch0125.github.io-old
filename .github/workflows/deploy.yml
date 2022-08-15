@@ -15,45 +15,60 @@ permissions:
   id-token: write
 
 jobs:
-  main:
+  # install dependencies with pnpm
+  build-my-site:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout your repository using git
-        uses: actions/checkout@v2
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v2.2.2
-        with:
-          version: 7.x.x
-      - name: Setup Node
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Install
-        shell: "bash"
+
+      - uses: pnpm/action-setup@v2.0.1
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
         run: pnpm install
 
-      - name: Build
-        shell: "bash"
-        env:
-          PACKAGE_MANAGER: ${{ steps.lockfile.outputs.PACKAGE_MANAGER }}
-        run: pnpm exec nx run my-site:build
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.4.0
+      - name: Build Apps
+        run: pnpm run -F my-site build
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@1
         with:
-          folder: apps/my-site/dist
+          path: apps/my-site/dist/
 
-      # - name: Upload Pages Artifact
-      #   uses: actions/upload-pages-artifact@v1
-      #   with:
-      #     path: "apps/my-site/dist/"
-
-  # deploy:
-  #   needs: main
-  #   runs-on: ubuntu-latest
-  #   environment:
-  #     name: github-pages
-  #     url: ${{ steps.deployment.outputs.page_url }}
-  #   steps:
-  #     - name: Deploy to GitHub Pages
-  #       id: deployment
-  #       uses: actions/deploy-pages@v1
+  deploy-my-site:
+    needs: buildy-my-site
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Github Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
