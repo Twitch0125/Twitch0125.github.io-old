@@ -37,19 +37,23 @@ jobs:
         env:
           PACKAGE_MANAGER: ${{ steps.lockfile.outputs.PACKAGE_MANAGER }}
         run: pnpm exec nx run my-site:build
-
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          path: "apps/my-site/dist/"
-
-  deploy:
-    needs: main
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v1
+        uses: JamesIves/github-pages-deploy-action@v4.4.0
+        with:
+          folder: app/my-site/dist
+
+      # - name: Upload Pages Artifact
+      #   uses: actions/upload-pages-artifact@v1
+      #   with:
+      #     path: "apps/my-site/dist/"
+
+  # deploy:
+  #   needs: main
+  #   runs-on: ubuntu-latest
+  #   environment:
+  #     name: github-pages
+  #     url: ${{ steps.deployment.outputs.page_url }}
+  #   steps:
+  #     - name: Deploy to GitHub Pages
+  #       id: deployment
+  #       uses: actions/deploy-pages@v1
