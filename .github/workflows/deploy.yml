@@ -60,7 +60,7 @@ jobs:
           path: apps/my-site/dist/
 
   deploy-my-site:
-    needs: buildy-my-site
+    needs: build-my-site
     permissions:
       pages: write
       id-token: write
