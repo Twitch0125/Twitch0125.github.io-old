@@ -24,6 +24,7 @@ jobs:
         uses: withastro/action@v0
         with:
           path: apps/my-site
+          package-manager: pnpm
   # Probably don't need this until we add more apps
   # main:
   #   runs-on: ubuntu-latest
